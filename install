@@ -1,0 +1,34 @@
+#!/bin/bash
+
+mkdir -p server/dist;
+echo "go server initialization"
+cd server 
+
+GOOS=linux GOARCH=amd64 go build -o dist/plugin-linux-amd64;
+echo "linux excetuable made.."
+GOOS=darwin GOARCH=amd64 go build -o dist/plugin-darwin-amd64;
+echo "darwin excetuable made.."
+GOOS=windows GOARCH=amd64 go build -o dist/plugin-windows-amd64.exe;
+echo "windows excetuable made.."
+cd ..
+
+cd webapp
+npm install
+./node_modules/.bin/webpack --mode=production
+echo "node packages installed and webapp done"
+cd ..
+
+mkdir -p com.mattermost.broadcast
+cd com.mattermost.broadcast
+mkdir -p server
+mkdir -p webapp
+cd ..
+mv server/dist com.mattermost.broadcast/server/
+mv webapp/dist com.mattermost.broadcast/webapp
+cp plugin.json com.mattermost.broadcast/
+
+tar -czvf broadcast.plugin.tar.gz com.mattermost.broadcast
+# rm -r com.mattermost.broadcast
+echo "check root directory for plugin zip file"
+
+
